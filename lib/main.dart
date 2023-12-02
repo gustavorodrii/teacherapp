@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:teacherapp/auth/auth_page.dart';
 import 'package:teacherapp/firebase_options.dart';
-import 'package:teacherapp/screens/home_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
