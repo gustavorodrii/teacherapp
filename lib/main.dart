@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:teacherapp/auth/auth_page.dart';
 import 'package:teacherapp/firebase_options.dart';
+import 'package:teacherapp/utils/custom_colors.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,7 +17,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const GetMaterialApp(
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        appBarTheme: const AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarBrightness: Brightness.dark,
+          ),
+        ),
+        primaryColor: primaryColor,
+        hoverColor: primaryColor,
+        colorScheme: ThemeData().colorScheme.copyWith(
+              primary: lowBlue,
+            ),
+      ),
       home: AuthPage(),
     );
   }

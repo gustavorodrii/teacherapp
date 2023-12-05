@@ -1,0 +1,20 @@
+import 'package:flutter/material.dart';
+
+const Color bgTextFieldColor = Color(0xFFFAFAFA);
+const Color primaryColor = Color(0xFF24112F);
+const Color constLight = Color(0xffffffff);
+const Color lightYellow = Color(0xffFFF6EA);
+const Color rose = Color(0xffFFCCB5);
+const Color orange = Color(0xffFFAB29);
+const Color orange2 = Color(0xffFF854A);
+const Color buttonWhiteColor = Color(0xffFAFAFA);
+const Color lightRose = Color(0xffF7CEBA);
+const Color grayTextMin = Color(0xff928897);
+const Color lightBlue = Color(0xffD4D7FF);
+const Color blue = Color(0xff659AD2);
+const Color lowYellow = Color(0xffFFF6EA);
+const Color lowBlue = Color(0xff8086E3);
+const Color lowRose = Color(0xffF0D2E0);
+const Color lowOrange = Color(0xffFFEED6);
+const Color disableButtonColor = Color(0xffCECFD1);
+const Color disableTextColor = Color(0xff617279);

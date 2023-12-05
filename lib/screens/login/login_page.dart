@@ -1,9 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-import 'package:teacherapp/screens/register/register_page.dart';
+import '../widget/textfield_custom.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
@@ -40,31 +39,43 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          TextField(
-            controller: emailController,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 35,
+          vertical: 10,
+        ),
+        child: Column(
+          children: [
+            TextFieldCustom(
+              controller: emailController,
               hintText: 'E-mail',
+              labelText: 'E-mail',
+              prefixIcon: Icon(
+                Icons.person,
+              ),
             ),
-          ),
-          TextField(
-            controller: passwordController,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
+            const SizedBox(
+              height: 15,
+            ),
+            TextFieldCustom(
+              controller: passwordController,
               hintText: 'Senha',
+              labelText: 'Senha',
+              prefixIcon: Icon(
+                Icons.password,
+              ),
+              obscureText: true,
             ),
-          ),
-          TextButton(
-            onPressed: widget.onTap,
-            child: Text('Register'),
-          ),
-          ElevatedButton(
-            onPressed: signInFireBase,
-            child: Text('Entrar'),
-          ),
-        ],
+            TextButton(
+              onPressed: widget.onTap,
+              child: Text('Register'),
+            ),
+            ElevatedButton(
+              onPressed: signInFireBase,
+              child: Text('Entrar'),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,5 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:teacherapp/screens/register/register_page.dart';
+
+import '../controller/register_controller.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -8,32 +12,26 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-final user = FirebaseAuth.instance.currentUser!;
-
-void signOut() async {
-  await FirebaseAuth.instance.signOut();
-}
-
 class _HomePageState extends State<HomePage> {
+  final RegisterController userController = Get.put<RegisterController>(
+    RegisterController(),
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Página Principal - ${user.email!}",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Text('UEPA ${userController.userModel?.birth}'),
+            ElevatedButton(
+              onPressed: () {
+                userController.signOut();
+              },
+              child: Text('Deslogar'),
+            ),
+          ],
         ),
-      ),
-      body: Column(
-        children: [
-          ElevatedButton(
-            onPressed: signOut,
-            child: Text('Deslogar'),
-          ),
-        ],
       ),
     );
   }
