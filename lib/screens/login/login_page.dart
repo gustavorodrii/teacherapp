@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:teacherapp/controller/user_controller.dart';
 
 import '../widget/textfield_custom.dart';
 
@@ -16,15 +17,7 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-TextEditingController emailController = TextEditingController();
-TextEditingController passwordController = TextEditingController();
-
-void signInFireBase() async {
-  await FirebaseAuth.instance.signInWithEmailAndPassword(
-    email: emailController.text.trim(),
-    password: passwordController.text.trim(),
-  );
-}
+final UserController userController = Get.put<UserController>(UserController());
 
 class _LoginPageState extends State<LoginPage> {
   @override
@@ -47,7 +40,8 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           children: [
             TextFieldCustom(
-              controller: emailController,
+              onChanged: userController.setEmailLogin,
+              keyboardType: TextInputType.emailAddress,
               hintText: 'E-mail',
               labelText: 'E-mail',
               prefixIcon: Icon(
@@ -58,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
               height: 15,
             ),
             TextFieldCustom(
-              controller: passwordController,
+              onChanged: userController.setPassLogin,
               hintText: 'Senha',
               labelText: 'Senha',
               prefixIcon: Icon(
@@ -71,7 +65,12 @@ class _LoginPageState extends State<LoginPage> {
               child: Text('Register'),
             ),
             ElevatedButton(
-              onPressed: signInFireBase,
+              onPressed: () {
+                userController.signInFireBase(
+                  email: userController.emailLogin!,
+                  pass: userController.passLogin,
+                );
+              },
               child: Text('Entrar'),
             ),
           ],

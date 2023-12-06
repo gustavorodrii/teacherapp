@@ -6,7 +6,6 @@ class UserModel {
   String? name;
   String? lastName;
   String? phone;
-  Timestamp? birth;
   Timestamp? registrationDate;
 
   UserModel.fromJson(Map<String, dynamic> data) {
@@ -14,7 +13,6 @@ class UserModel {
     name = data['name'] as String?;
     lastName = data['lastName'] as String?;
     phone = data['phone'] as String?;
-    birth = data['birth'] as Timestamp?;
     registrationDate = data['registrationDate'] as Timestamp?;
   }
 
@@ -24,13 +22,12 @@ class UserModel {
       "name": name,
       "lastName": lastName,
       "phone": phone,
-      "birth": birth,
       "registrationDate": registrationDate,
     };
   }
 
   @override
   String toString() {
-    return 'UserModel{email: $email, name: $name, lastName: $lastName, phone: $phone, birth: $birth, registrationDate: $registrationDate}';
+    return 'UserModel{email: $email, name: $name, lastName: $lastName, phone: $phone, registrationDate: $registrationDate}';
   }
 }

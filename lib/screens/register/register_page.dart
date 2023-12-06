@@ -1,14 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:teacherapp/controller/register_controller.dart';
+import 'package:teacherapp/controller/user_controller.dart';
 import 'package:teacherapp/model/user_model.dart';
 import 'package:teacherapp/utils/custom_colors.dart';
 
-import '../../utils/data_input_formatter.dart';
 import '../../utils/telefone_input_formatter.dart';
 import '../widget/textfield_custom.dart';
 
@@ -27,8 +25,6 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
-    DateTime? _auxBirth;
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: constLight,
@@ -64,8 +60,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   horizontal: 35,
                   vertical: 20,
                 ),
-                child: GetBuilder<RegisterController>(
-                  init: RegisterController(),
+                child: GetBuilder<UserController>(
+                  init: UserController(),
                   builder: (controller) {
                     return Column(
                       children: [
@@ -87,7 +83,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           children: [
                             Expanded(
                               child: TextFieldCustom(
-                                // controller: controller.nameController,
+                                keyboardType: TextInputType.name,
                                 hintText: 'Nome',
                                 labelText: 'Nome',
                                 onChanged: controller.setName,
@@ -102,7 +98,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             Expanded(
                               child: TextFieldCustom(
-                                // controller: controller.lastNameController,
+                                keyboardType: TextInputType.name,
                                 hintText: 'Sobrenome',
                                 labelText: 'Sobrenome',
                                 onChanged: controller.setLastName,
@@ -117,7 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           height: 15,
                         ),
                         TextFieldCustom(
-                          // controller: controller.phoneController,
+                          keyboardType: TextInputType.phone,
                           hintText: 'Telefone',
                           labelText: 'Telefone',
                           onChanged: controller.setPhone,
@@ -133,7 +129,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           height: 15,
                         ),
                         TextFieldCustom(
-                          // controller: controller.emailController,
+                          keyboardType: TextInputType.emailAddress,
                           hintText: 'E-mail',
                           labelText: 'E-mail',
                           onChanged: controller.setEmail,
@@ -144,24 +140,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(
                           height: 15,
                         ),
-                        TextFieldCustom(
-                          // controller: controller.birthController,
-                          hintText: 'Data de nascimento',
-                          labelText: 'Data de nascimento',
-                          onChanged: controller.setBirth,
-                          prefixIcon: const Icon(
-                            Icons.person,
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            DataInputFormatter()
-                          ],
-                        ),
                         const SizedBox(
                           height: 15,
                         ),
                         TextFieldCustom(
-                          // controller: controller.passwordController,
                           hintText: 'Senha',
                           labelText: 'Senha',
                           onChanged: controller.setPass,
@@ -174,7 +156,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           height: 15,
                         ),
                         TextFieldCustom(
-                          // controller: controller.confirmPasswordController,
                           hintText: 'Confirme sua senha',
                           labelText: 'Confirme sua senha',
                           onChanged: controller.setPassConfirm,
@@ -219,7 +200,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                       .toLowerCase(),
                                   "phone": controller.phone.value,
                                   "registrationDate": Timestamp.now(),
-                                  "birthDate": controller.birth.toString()
                                 };
 
                                 controller.signUpFireBase(
@@ -228,7 +208,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 );
                               },
                               child: const Text(
-                                'Entrar',
+                                'Cadastrar',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
