@@ -17,77 +17,77 @@ class UserController extends GetxController {
 
   User? firebaseUser;
 
-  //login email
-  String? emailLogin;
-  Future<void> setEmailLogin(String setemail) async {
-    emailLogin = setemail;
-    await box.write('email', emailLogin);
-    update();
-  }
+  // //login email
+  // String? emailLogin;
+  // Future<void> setEmailLogin(String setemail) async {
+  //   emailLogin = setemail;
+  //   await box.write('email', emailLogin);
+  //   update();
+  // }
 
-  Future<void> removeEmail() async {
-    await box.remove('email');
-  }
+  // Future<void> removeEmail() async {
+  //   await box.remove('email');
+  // }
 
-  Future<void> getEmail() async {
-    final String savedemail = box.read('email') ?? '';
-    emailLogin = savedemail;
-    update();
-  }
+  // Future<void> getEmail() async {
+  //   final String savedemail = box.read('email') ?? '';
+  //   emailLogin = savedemail;
+  //   update();
+  // }
 
-  //login senha
-  late String passLogin;
-  void setPassLogin(String setpass) {
-    passLogin = setpass;
-    update();
-  }
+  // //login senha
+  // late String passLogin;
+  // void setPassLogin(String setpass) {
+  //   passLogin = setpass;
+  //   update();
+  // }
 
-  //name
-  RxString name = ''.obs;
-  void setName(String setName) {
-    name.value = setName;
-    update();
-  }
+  // //name
+  // RxString name = ''.obs;
+  // void setName(String setName) {
+  //   name.value = setName;
+  //   update();
+  // }
 
-  //last name
-  RxString lastName = ''.obs;
-  void setLastName(String setLastName) {
-    lastName.value = setLastName;
-    update();
-  }
+  // //last name
+  // RxString lastName = ''.obs;
+  // void setLastName(String setLastName) {
+  //   lastName.value = setLastName;
+  //   update();
+  // }
 
-  //phone
-  RxString phone = ''.obs;
-  void setPhone(String setPhone) {
-    phone.value = setPhone;
-    update();
-  }
+  // //phone
+  // RxString phone = ''.obs;
+  // void setPhone(String setPhone) {
+  //   phone.value = setPhone;
+  //   update();
+  // }
 
-  //email
-  RxString email = ''.obs;
+  // //email
+  // RxString email = ''.obs;
 
-  void setEmail(String setEmail) {
-    email.value = setEmail;
-    update();
-  }
+  // void setEmail(String setEmail) {
+  //   email.value = setEmail;
+  //   update();
+  // }
 
-  //pass
-  RxString pass = ''.obs;
-  void setPass(String setPass) {
-    pass.value = setPass;
-    update();
-  }
+  // //pass
+  // RxString pass = ''.obs;
+  // void setPass(String setPass) {
+  //   pass.value = setPass;
+  //   update();
+  // }
 
-  //pass confirm
-  RxString passConfirm = ''.obs;
-  void setPassConfirm(String setPassConfirm) {
-    passConfirm.value = setPassConfirm;
-    update();
-  }
+  // //pass confirm
+  // RxString passConfirm = ''.obs;
+  // void setPassConfirm(String setPassConfirm) {
+  //   passConfirm.value = setPassConfirm;
+  //   update();
+  // }
 
   @override
   void onInit() async {
-    await getEmail();
+    // await getEmail();
     super.onInit();
   }
 
@@ -126,8 +126,14 @@ class UserController extends GetxController {
     await FirebaseAuth.instance.signOut();
   }
 
-  TextEditingController emailController = TextEditingController();
+  TextEditingController emailControllerLogin = TextEditingController();
+  TextEditingController passwordControllerLogin = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
 
   void signInFireBase({
     required String email,
@@ -142,28 +148,20 @@ class UserController extends GetxController {
     )
         .then((value) async {
       firebaseUser = value.user;
-      await _loadUserData();
       update();
     });
     isLoading.value = false;
     update();
   }
 
-  Future<void> _loadUserData() async {
-    try {
-      DocumentSnapshot doc =
-          await firestore.collection("users").doc(firebaseUser!.uid).get();
+  final userUid = FirebaseAuth.instance.currentUser?.uid;
+  Future<UserModel?> readUser() async {
+    final docUser = FirebaseFirestore.instance.collection("users").doc(userUid);
+    final snapshot = await docUser.get();
 
-      if (doc.exists) {
-        userData.value = doc.data() as Map<String, dynamic>;
-      } else {
-        // O documento não existe ou está vazio.
-        // Você pode decidir o que fazer aqui, por exemplo, definir userData como um Map vazio.
-        userData.value = <String, dynamic>{};
-      }
-    } catch (e) {
-      print("Erro ao carregar dados do usuário: $e");
-      // Trate o erro conforme necessário.
+    if (snapshot.exists) {
+      return UserModel.fromJson(snapshot.data()!);
     }
+    return null;
   }
 }

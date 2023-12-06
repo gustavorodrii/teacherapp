@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:teacherapp/controller/user_controller.dart';
 import 'package:teacherapp/model/user_model.dart';
+import 'package:teacherapp/screens/login/login_page.dart';
 import 'package:teacherapp/utils/custom_colors.dart';
 
 import '../../utils/telefone_input_formatter.dart';
@@ -83,10 +84,11 @@ class _RegisterPageState extends State<RegisterPage> {
                           children: [
                             Expanded(
                               child: TextFieldCustom(
+                                controller: controller.nameController,
                                 keyboardType: TextInputType.name,
                                 hintText: 'Nome',
                                 labelText: 'Nome',
-                                onChanged: controller.setName,
+                                // onChanged: controller.setName,
                                 onSubmitted: (name) {},
                                 prefixIcon: const Icon(
                                   Icons.perm_contact_cal,
@@ -98,10 +100,11 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             Expanded(
                               child: TextFieldCustom(
+                                controller: controller.lastNameController,
                                 keyboardType: TextInputType.name,
                                 hintText: 'Sobrenome',
                                 labelText: 'Sobrenome',
-                                onChanged: controller.setLastName,
+                                // onChanged: controller.setLastName,
                                 prefixIcon: const Icon(
                                   Icons.perm_contact_cal,
                                 ),
@@ -113,10 +116,11 @@ class _RegisterPageState extends State<RegisterPage> {
                           height: 15,
                         ),
                         TextFieldCustom(
+                          controller: controller.phoneController,
                           keyboardType: TextInputType.phone,
                           hintText: 'Telefone',
                           labelText: 'Telefone',
-                          onChanged: controller.setPhone,
+                          // onChanged: controller.setPhone,
                           prefixIcon: const Icon(
                             Icons.phone_android,
                           ),
@@ -129,10 +133,11 @@ class _RegisterPageState extends State<RegisterPage> {
                           height: 15,
                         ),
                         TextFieldCustom(
+                          controller: controller.emailController,
                           keyboardType: TextInputType.emailAddress,
                           hintText: 'E-mail',
                           labelText: 'E-mail',
-                          onChanged: controller.setEmail,
+                          // onChanged: controller.setEmail,
                           prefixIcon: const Icon(
                             Icons.person,
                           ),
@@ -144,9 +149,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           height: 15,
                         ),
                         TextFieldCustom(
+                          controller: controller.passwordController,
                           hintText: 'Senha',
                           labelText: 'Senha',
-                          onChanged: controller.setPass,
+                          // onChanged: controller.setPass,
                           prefixIcon: const Icon(
                             Icons.password,
                           ),
@@ -156,9 +162,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           height: 15,
                         ),
                         TextFieldCustom(
+                          controller: controller.confirmPasswordController,
                           hintText: 'Confirme sua senha',
                           labelText: 'Confirme sua senha',
-                          onChanged: controller.setPassConfirm,
+                          // onChanged: controller.setPassConfirm,
                           prefixIcon: const Icon(
                             Icons.password,
                           ),
@@ -193,18 +200,23 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               onPressed: () async {
                                 final Map<String, dynamic> userData = {
-                                  "name": controller.name.value.trim(),
-                                  "lastName": controller.lastName.value.trim(),
-                                  "email": controller.email.value
+                                  "name": controller.nameController.value.text
+                                      .trim(),
+                                  "lastName": controller
+                                      .lastNameController.value.text
+                                      .trim(),
+                                  "email": controller.emailController.value.text
                                       .trim()
                                       .toLowerCase(),
-                                  "phone": controller.phone.value,
+                                  "phone":
+                                      controller.phoneController.text.trim(),
                                   "registrationDate": Timestamp.now(),
                                 };
 
                                 controller.signUpFireBase(
                                   userData: UserModel.fromJson(userData),
-                                  pass: controller.pass.value,
+                                  pass:
+                                      controller.passwordController.text.trim(),
                                 );
                               },
                               child: const Text(

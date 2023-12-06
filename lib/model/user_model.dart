@@ -8,12 +8,12 @@ class UserModel {
   String? phone;
   Timestamp? registrationDate;
 
-  UserModel.fromJson(Map<String, dynamic> data) {
-    email = data['email'] as String?;
-    name = data['name'] as String?;
-    lastName = data['lastName'] as String?;
-    phone = data['phone'] as String?;
-    registrationDate = data['registrationDate'] as Timestamp?;
+  UserModel.fromJson(Map<String, dynamic>? data) {
+    email = data?['email'] as String?;
+    name = data?['name'] as String?;
+    lastName = data?['lastName'] as String?;
+    phone = data?['phone'] as String?;
+    registrationDate = data?['registrationDate'] as Timestamp?;
   }
 
   Map<String, dynamic> toMap() {

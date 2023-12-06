@@ -40,7 +40,8 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           children: [
             TextFieldCustom(
-              onChanged: userController.setEmailLogin,
+              controller: userController.emailControllerLogin,
+              // onChanged: userController.setEmailLogin,
               keyboardType: TextInputType.emailAddress,
               hintText: 'E-mail',
               labelText: 'E-mail',
@@ -52,7 +53,8 @@ class _LoginPageState extends State<LoginPage> {
               height: 15,
             ),
             TextFieldCustom(
-              onChanged: userController.setPassLogin,
+              controller: userController.passwordControllerLogin,
+              // onChanged: userController.setPassLogin,
               hintText: 'Senha',
               labelText: 'Senha',
               prefixIcon: Icon(
@@ -67,8 +69,8 @@ class _LoginPageState extends State<LoginPage> {
             ElevatedButton(
               onPressed: () {
                 userController.signInFireBase(
-                  email: userController.emailLogin!,
-                  pass: userController.passLogin,
+                  email: userController.emailControllerLogin.text.trim(),
+                  pass: userController.passwordControllerLogin.text.trim(),
                 );
               },
               child: Text('Entrar'),

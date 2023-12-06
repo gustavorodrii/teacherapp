@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:teacherapp/model/user_model.dart';
 import 'package:teacherapp/screens/register/register_page.dart';
 import 'package:teacherapp/utils/custom_colors.dart';
 
@@ -27,12 +28,10 @@ class _HomePageState extends State<HomePage> {
           body: SafeArea(
             child: Column(
               children: [
-                Text(
-                  'olha ele ${userController.emailLogin}',
-                  style: TextStyle(
-                    color: primaryColor,
-                  ),
-                ),
+                Text('${userController.userModel?.name}'),
+                Text('${userController.userModel?.lastName}'),
+                Text('${userController.userModel?.phone}'),
+                Text('${userController.userModel?.email}'),
                 ElevatedButton(
                   onPressed: () {
                     userController.signOut();
@@ -46,4 +45,9 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+
+  Widget buildUser(UserModel user) => ListTile(
+        title: Text(user.email.toString()),
+        subtitle: Text(user.phone.toString()),
+      );
 }
