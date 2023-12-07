@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:teacherapp/model/user_model.dart';
+import 'package:teacherapp/screens/login/login_page.dart';
+
+import '../model/expense_model.dart';
 
 class UserController extends GetxController {
   final GetStorage box = GetStorage();
@@ -16,80 +21,6 @@ class UserController extends GetxController {
   UserModel? userModel;
 
   User? firebaseUser;
-
-  // //login email
-  // String? emailLogin;
-  // Future<void> setEmailLogin(String setemail) async {
-  //   emailLogin = setemail;
-  //   await box.write('email', emailLogin);
-  //   update();
-  // }
-
-  // Future<void> removeEmail() async {
-  //   await box.remove('email');
-  // }
-
-  // Future<void> getEmail() async {
-  //   final String savedemail = box.read('email') ?? '';
-  //   emailLogin = savedemail;
-  //   update();
-  // }
-
-  // //login senha
-  // late String passLogin;
-  // void setPassLogin(String setpass) {
-  //   passLogin = setpass;
-  //   update();
-  // }
-
-  // //name
-  // RxString name = ''.obs;
-  // void setName(String setName) {
-  //   name.value = setName;
-  //   update();
-  // }
-
-  // //last name
-  // RxString lastName = ''.obs;
-  // void setLastName(String setLastName) {
-  //   lastName.value = setLastName;
-  //   update();
-  // }
-
-  // //phone
-  // RxString phone = ''.obs;
-  // void setPhone(String setPhone) {
-  //   phone.value = setPhone;
-  //   update();
-  // }
-
-  // //email
-  // RxString email = ''.obs;
-
-  // void setEmail(String setEmail) {
-  //   email.value = setEmail;
-  //   update();
-  // }
-
-  // //pass
-  // RxString pass = ''.obs;
-  // void setPass(String setPass) {
-  //   pass.value = setPass;
-  //   update();
-  // }
-
-  // //pass confirm
-  // RxString passConfirm = ''.obs;
-  // void setPassConfirm(String setPassConfirm) {
-  //   passConfirm.value = setPassConfirm;
-  //   update();
-  // }
-
-  @override
-  void onInit() async {
-    // await getEmail();
-    super.onInit();
-  }
 
   Future<void> _saveUserData(UserModel userData) async {
     userModel = userData;
@@ -148,20 +79,181 @@ class UserController extends GetxController {
     )
         .then((value) async {
       firebaseUser = value.user;
+      await firestore
+          .collection("users")
+          .doc(firebaseUser!.uid)
+          .get()
+          .then((userSnapshot) {
+        if (userSnapshot.exists) {
+          userController.userData.value = userSnapshot.data()!;
+        }
+      });
       update();
     });
     isLoading.value = false;
     update();
   }
 
-  final userUid = FirebaseAuth.instance.currentUser?.uid;
-  Future<UserModel?> readUser() async {
-    final docUser = FirebaseFirestore.instance.collection("users").doc(userUid);
-    final snapshot = await docUser.get();
+  String? selectedType = 'Selecione';
 
-    if (snapshot.exists) {
-      return UserModel.fromJson(snapshot.data()!);
+  void setSelectedType(String value) {
+    selectedType = value;
+    update();
+  }
+
+  List<String> listTypeOptions = [
+    'Selecione',
+    'Aluguel/Moradia',
+    'Financiamento de Casa',
+    'Educação',
+    'Alimentação',
+    'Transporte',
+    'Saúde',
+    'Seguro',
+    'Entretenimento',
+    'Telefone/Internet',
+    'Água',
+    'Luz',
+    'Gás',
+    'Supermercado',
+    'Restaurantes/Cafés',
+    'Roupas',
+    'Cuidados Pessoais',
+    'Assinaturas (ex: streaming)',
+    'Viagens/Férias',
+    'Impostos',
+    'Economias/Investimentos',
+    'Outros',
+  ];
+
+  TextEditingController nomeDespesa = TextEditingController();
+  TextEditingController valorDespesa = TextEditingController();
+  TextEditingController dataDespesa = TextEditingController();
+
+  void resetControllers() {
+    nomeDespesa.clear();
+    valorDespesa.clear();
+    dataDespesa.clear();
+    selectedType = null;
+  }
+
+  Future<void> saveExpense() async {
+    try {
+      // Obtém o usuário atualmente autenticado
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        String userId = user.uid;
+
+        final expense = Expense(
+          nomeDespesa: nomeDespesa.text,
+          valorDespesa: double.parse(valorDespesa.text),
+          dataDespesa: dataDespesa.text,
+          tipoDespesa: selectedType,
+        );
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .collection('expenses')
+            .add({
+          'nomeDespesa': expense.nomeDespesa,
+          'valorDespesa': expense.valorDespesa,
+          'dataDespesa': expense.dataDespesa,
+          'tipoDespesa': expense.tipoDespesa,
+        });
+        update();
+
+        resetControllers();
+        update();
+        getExpenses();
+
+        Get.back();
+      } else {
+        print('Usuário não autenticado.');
+      }
+    } catch (e) {
+      print('Erro ao salvar despesa: $e');
     }
-    return null;
+  }
+
+  RxList<Expense> expensesList = <Expense>[].obs;
+  final _expensesController = StreamController<List<Expense>>.broadcast();
+  Stream<List<Expense>> get expensesStream => _expensesController.stream;
+
+  void startExpenseStream() {
+    _expensesController.add(expensesList);
+  }
+
+  Future<void> getExpenses() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        String userId = user.uid;
+
+        CollectionReference expensesCollection = FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .collection('expenses');
+
+        QuerySnapshot querySnapshot = await expensesCollection.get();
+
+        List<Expense> expenses = querySnapshot.docs.map((doc) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          return Expense.fromMap(data);
+        }).toList();
+
+        expensesList.assignAll(expenses);
+        startExpenseStream();
+      }
+    } catch (e) {
+      print('Erro ao obter despesas: $e');
+    }
+  }
+
+  // Future<List<Expense>> getExpenses() async {
+  //   try {
+  //     // Obtém o usuário atualmente autenticado
+  //     User? user = FirebaseAuth.instance.currentUser;
+
+  //     if (user != null) {
+  //       // Obtém o ID do usuário
+  //       String userId = user.uid;
+
+  //       // Obtém a referência para a coleção "expenses" do usuário
+  //       CollectionReference expensesCollection = FirebaseFirestore.instance
+  //           .collection('users')
+  //           .doc(userId)
+  //           .collection('expenses');
+
+  //       // Obtém os documentos da coleção "expenses"
+  //       QuerySnapshot querySnapshot = await expensesCollection.get();
+
+  //       // Mapeia os documentos para a lista de objetos Expense
+  //       List<Expense> expenses = querySnapshot.docs.map((doc) {
+  //         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+  //         return Expense.fromMap(data);
+  //       }).toList();
+  //       expensesList.assignAll(expenses);
+
+  //       return expenses;
+  //     } else {
+  //       // O usuário não está autenticado
+  //       print('Usuário não autenticado.');
+  //       // Trate conforme necessário
+  //       return [];
+  //     }
+  //   } catch (e) {
+  //     print('Erro ao obter despesas: $e');
+  //     // Trate conforme necessário
+  //     return [];
+  //   }
+  // }
+
+  @override
+  void onInit() async {
+    getExpenses();
+    super.onInit();
   }
 }

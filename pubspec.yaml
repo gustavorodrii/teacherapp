@@ -40,6 +40,9 @@ dependencies:
   cloud_firestore: ^4.13.3
   get: ^4.6.5
   get_storage: ^2.1.1
+  dropdown_button2: ^1.8.8
+  provider: ^6.1.1
+
 
 dev_dependencies:
   flutter_test:

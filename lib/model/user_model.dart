@@ -1,7 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserModel {
-  UserModel();
+  UserModel({
+    required email,
+    required name,
+    required lastName,
+    required phone,
+    required registrationDate,
+  });
   String? email;
   String? name;
   String? lastName;
@@ -30,4 +36,16 @@ class UserModel {
   String toString() {
     return 'UserModel{email: $email, name: $name, lastName: $lastName, phone: $phone, registrationDate: $registrationDate}';
   }
+
+  // factory UserModel.fromSnapshot(
+  //     DocumentSnapshot<Map<String, dynamic>> document) {
+  //   final dataUser = document.data()!;
+  //   return UserModel(
+  //     email: dataUser['email'],
+  //     name: dataUser['name'],
+  //     lastName: dataUser['lastName'],
+  //     phone: dataUser['phone'],
+  //     registrationDate: dataUser['registrationDate'],
+  //   );
+  // }
 }

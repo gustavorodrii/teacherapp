@@ -14,6 +14,7 @@ class TextFieldCustom extends StatelessWidget {
   final Widget? suffixIcon;
   final void Function(String)? onChanged;
   final void Function(String)? onSubmitted;
+  final Widget? label;
   const TextFieldCustom({
     super.key,
     this.controller,
@@ -27,6 +28,7 @@ class TextFieldCustom extends StatelessWidget {
     this.suffixIcon,
     this.onChanged,
     this.onSubmitted,
+    this.label,
   });
 
   @override
@@ -42,6 +44,7 @@ class TextFieldCustom extends StatelessWidget {
         fillColor: constLight,
         prefixIcon: prefixIcon,
         prefixIconColor: prefixIconColor,
+        label: label,
         hintText: hintText,
         labelText: labelText,
         suffixIcon: suffixIcon,

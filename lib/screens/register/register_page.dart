@@ -88,7 +88,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                 keyboardType: TextInputType.name,
                                 hintText: 'Nome',
                                 labelText: 'Nome',
-                                // onChanged: controller.setName,
                                 onSubmitted: (name) {},
                                 prefixIcon: const Icon(
                                   Icons.perm_contact_cal,
@@ -104,7 +103,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                 keyboardType: TextInputType.name,
                                 hintText: 'Sobrenome',
                                 labelText: 'Sobrenome',
-                                // onChanged: controller.setLastName,
                                 prefixIcon: const Icon(
                                   Icons.perm_contact_cal,
                                 ),
@@ -120,7 +118,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           keyboardType: TextInputType.phone,
                           hintText: 'Telefone',
                           labelText: 'Telefone',
-                          // onChanged: controller.setPhone,
                           prefixIcon: const Icon(
                             Icons.phone_android,
                           ),
@@ -137,13 +134,9 @@ class _RegisterPageState extends State<RegisterPage> {
                           keyboardType: TextInputType.emailAddress,
                           hintText: 'E-mail',
                           labelText: 'E-mail',
-                          // onChanged: controller.setEmail,
                           prefixIcon: const Icon(
                             Icons.person,
                           ),
-                        ),
-                        const SizedBox(
-                          height: 15,
                         ),
                         const SizedBox(
                           height: 15,
@@ -152,7 +145,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           controller: controller.passwordController,
                           hintText: 'Senha',
                           labelText: 'Senha',
-                          // onChanged: controller.setPass,
                           prefixIcon: const Icon(
                             Icons.password,
                           ),
@@ -165,7 +157,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           controller: controller.confirmPasswordController,
                           hintText: 'Confirme sua senha',
                           labelText: 'Confirme sua senha',
-                          // onChanged: controller.setPassConfirm,
                           prefixIcon: const Icon(
                             Icons.password,
                           ),

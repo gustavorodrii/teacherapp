@@ -6,10 +6,14 @@ import 'package:teacherapp/auth/auth_page.dart';
 import 'package:teacherapp/firebase_options.dart';
 import 'package:teacherapp/utils/custom_colors.dart';
 
+import 'controller/user_controller.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  runApp(
+    const MyApp(),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,6 +21,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(UserController());
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -25,8 +30,11 @@ class MyApp extends StatelessWidget {
             statusBarBrightness: Brightness.dark,
           ),
         ),
-        primaryColor: primaryColor,
-        hoverColor: primaryColor,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: lowBlue,
+        ),
+        primaryColor: lowBlue,
+        hoverColor: lowBlue,
         colorScheme: ThemeData().colorScheme.copyWith(
               primary: lowBlue,
             ),
