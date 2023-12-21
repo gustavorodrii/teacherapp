@@ -4,15 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:teacherapp/model/user_model.dart';
 import 'package:teacherapp/screens/login/login_page.dart';
 
 import '../model/expense_model.dart';
 
 class UserController extends GetxController {
-  final GetStorage box = GetStorage();
-
   RxBool isLoading = false.obs;
   Rx<Map<String, dynamic>> userData =
       Rx<Map<String, dynamic>>(<String, dynamic>{});
@@ -169,6 +166,7 @@ class UserController extends GetxController {
         getExpenses();
 
         Get.back();
+        update();
       } else {
         print('Usuário não autenticado.');
       }
@@ -196,60 +194,48 @@ class UserController extends GetxController {
             .collection('users')
             .doc(userId)
             .collection('expenses');
+        update();
 
         QuerySnapshot querySnapshot = await expensesCollection.get();
 
         List<Expense> expenses = querySnapshot.docs.map((doc) {
           Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          doc.id;
+          data['id'] = doc.id;
           return Expense.fromMap(data);
         }).toList();
+        update();
 
         expensesList.assignAll(expenses);
         startExpenseStream();
+        update();
       }
     } catch (e) {
       print('Erro ao obter despesas: $e');
     }
   }
 
-  // Future<List<Expense>> getExpenses() async {
-  //   try {
-  //     // Obtém o usuário atualmente autenticado
-  //     User? user = FirebaseAuth.instance.currentUser;
+  Future<void> deleteExpense(String id) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      String userId = user!.uid;
 
-  //     if (user != null) {
-  //       // Obtém o ID do usuário
-  //       String userId = user.uid;
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("expenses")
+          .doc(id)
+          .delete();
 
-  //       // Obtém a referência para a coleção "expenses" do usuário
-  //       CollectionReference expensesCollection = FirebaseFirestore.instance
-  //           .collection('users')
-  //           .doc(userId)
-  //           .collection('expenses');
-
-  //       // Obtém os documentos da coleção "expenses"
-  //       QuerySnapshot querySnapshot = await expensesCollection.get();
-
-  //       // Mapeia os documentos para a lista de objetos Expense
-  //       List<Expense> expenses = querySnapshot.docs.map((doc) {
-  //         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-  //         return Expense.fromMap(data);
-  //       }).toList();
-  //       expensesList.assignAll(expenses);
-
-  //       return expenses;
-  //     } else {
-  //       // O usuário não está autenticado
-  //       print('Usuário não autenticado.');
-  //       // Trate conforme necessário
-  //       return [];
-  //     }
-  //   } catch (e) {
-  //     print('Erro ao obter despesas: $e');
-  //     // Trate conforme necessário
-  //     return [];
-  //   }
-  // }
+      expensesList.removeWhere(
+        (element) => element.id == id,
+      );
+      update();
+      getExpenses();
+    } catch (e) {
+      print('Erro ao deletar $e');
+    }
+  }
 
   @override
   void onInit() async {

@@ -40,18 +40,23 @@ class _MyAppBarState extends State<MyAppBar> {
             title: Text('Error ao carregar dados'),
           );
         }
-        var userData = snapshot.data?.data();
         return AppBar(
           backgroundColor: lowBlue,
           elevation: 1,
           titleSpacing: 0,
           leading: IconButton(
-            onPressed: () => widget._scaffoldKey.currentState!.openDrawer(),
-            icon: const Icon(
-              Icons.menu,
-              color: primaryColor,
+            onPressed: userController.signOut,
+            icon: Icon(
+              Icons.logout,
             ),
           ),
+          // leading: IconButton(
+          //   onPressed: () => widget._scaffoldKey.currentState!.openDrawer(),
+          //   icon: const Icon(
+          //     Icons.menu,
+          //     color: primaryColor,
+          //   ),
+          // ),
           title: Padding(
             padding: const EdgeInsets.only(right: 20),
             child: Row(
@@ -94,7 +99,6 @@ class _MyAppBarState extends State<MyAppBar> {
             ),
           ),
         );
-        return Container();
       },
     );
   }

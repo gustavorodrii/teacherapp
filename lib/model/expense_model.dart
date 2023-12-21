@@ -1,4 +1,5 @@
 class Expense {
+  final String? id;
   final String? nomeDespesa;
   final double? valorDespesa;
   final String? dataDespesa;
@@ -9,6 +10,7 @@ class Expense {
     this.valorDespesa,
     this.dataDespesa,
     this.tipoDespesa,
+    this.id,
   });
 
   factory Expense.fromMap(Map<String, dynamic> map) {
@@ -17,6 +19,7 @@ class Expense {
       valorDespesa: map['valorDespesa'],
       dataDespesa: map['dataDespesa'],
       tipoDespesa: map['tipoDespesa'],
+      id: map['id'],
     );
   }
 }
