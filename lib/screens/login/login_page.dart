@@ -6,7 +6,7 @@ import 'package:teacherapp/controller/user_controller.dart';
 
 import '../../model/user_model.dart';
 import '../../utils/custom_colors.dart';
-import '../widget/textfield_custom.dart';
+import '../../utils/textfield_custom.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;

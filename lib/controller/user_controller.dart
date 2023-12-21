@@ -1,9 +1,13 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:teacherapp/model/user_model.dart';
 import 'package:teacherapp/screens/login/login_page.dart';
 
@@ -16,6 +20,15 @@ class UserController extends GetxController {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   UserModel? userModel;
+  String? kindOfDoc = 'Selecione';
+
+  final List<String> kindOfDocData = [
+    'Selecione',
+    'Comprovante',
+    'Nota Fiscal',
+    'Boleto',
+    'Outros',
+  ];
 
   User? firebaseUser;
 
@@ -62,6 +75,7 @@ class UserController extends GetxController {
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
+  TextEditingController expensesDescriptionAttach = TextEditingController();
 
   void signInFireBase({
     required String email,
@@ -131,13 +145,42 @@ class UserController extends GetxController {
     nomeDespesa.clear();
     valorDespesa.clear();
     dataDespesa.clear();
-    selectedType = null;
+    expensesDescriptionAttach.clear();
+    kindOfDoc = 'Selecione';
+
+    selectedType = 'Selecione';
+  }
+
+  Future<void> updateLatestExpenseTimestamp(String userId) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('expenses')
+          .orderBy('timestamp', descending: true)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        Timestamp latestTimestamp =
+            querySnapshot.docs.first['timestamp'] as Timestamp;
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .update({'latestExpenseTimestamp': latestTimestamp});
+      }
+    } catch (e) {
+      print('Erro ao atualizar latestExpenseTimestamp: $e');
+    }
   }
 
   Future<void> saveExpense() async {
     try {
       // Obtém o usuário atualmente autenticado
       User? user = FirebaseAuth.instance.currentUser;
+
+      final data = Timestamp.now();
 
       if (user != null) {
         String userId = user.uid;
@@ -147,6 +190,10 @@ class UserController extends GetxController {
           valorDespesa: double.parse(valorDespesa.text),
           dataDespesa: dataDespesa.text,
           tipoDespesa: selectedType,
+          image: imageUrl,
+          kindOfDoc: kindOfDoc,
+          descriptionAttach: expensesDescriptionAttach.text,
+          timestamp: data,
         );
 
         await FirebaseFirestore.instance
@@ -158,7 +205,13 @@ class UserController extends GetxController {
           'valorDespesa': expense.valorDespesa,
           'dataDespesa': expense.dataDespesa,
           'tipoDespesa': expense.tipoDespesa,
+          'image': expense.image,
+          'kindOfDoc': expense.kindOfDoc,
+          'descriptionAttach': expense.descriptionAttach,
+          'timestamp': expense.timestamp,
         });
+        await updateLatestExpenseTimestamp(userId);
+
         update();
 
         resetControllers();
@@ -235,6 +288,52 @@ class UserController extends GetxController {
     } catch (e) {
       print('Erro ao deletar $e');
     }
+  }
+
+  void deleteimage() {
+    imageUrl = null;
+    selectedImage = null;
+    update();
+  }
+
+  String? imageUrl;
+
+  XFile? selectedImage;
+  Future<void> getFile() async {
+    update();
+
+    ImagePicker imagePicker = ImagePicker();
+    XFile? file = await imagePicker.pickImage(
+      source: ImageSource.gallery,
+    );
+    update();
+
+    if (file == null) return;
+
+    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+    update();
+
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    update();
+
+    Reference referenceDirImages = referenceRoot.child('expenses');
+    update();
+
+    Reference referenceImageToUpload = referenceDirImages.child(uniqueFileName);
+    update();
+
+    try {
+      update();
+
+      await referenceImageToUpload.putFile(File(file!.path));
+      update();
+
+      imageUrl = await referenceImageToUpload.getDownloadURL();
+      update();
+
+      selectedImage = file;
+      update();
+    } catch (e) {}
   }
 
   @override

@@ -9,7 +9,7 @@ import 'package:teacherapp/screens/login/login_page.dart';
 import 'package:teacherapp/utils/custom_colors.dart';
 
 import '../../utils/telefone_input_formatter.dart';
-import '../widget/textfield_custom.dart';
+import '../../utils/textfield_custom.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;

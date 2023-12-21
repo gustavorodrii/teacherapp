@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'expense_model.dart';
+
 class UserModel {
   UserModel({
     required email,
@@ -7,12 +9,14 @@ class UserModel {
     required lastName,
     required phone,
     required registrationDate,
+    this.latestExpenseTimestamp,
   });
   String? email;
   String? name;
   String? lastName;
   String? phone;
   Timestamp? registrationDate;
+  Timestamp? latestExpenseTimestamp;
 
   UserModel.fromJson(Map<String, dynamic>? data) {
     email = data?['email'] as String?;
@@ -29,6 +33,7 @@ class UserModel {
       "lastName": lastName,
       "phone": phone,
       "registrationDate": registrationDate,
+      "latestExpenseTimestamp": latestExpenseTimestamp,
     };
   }
 

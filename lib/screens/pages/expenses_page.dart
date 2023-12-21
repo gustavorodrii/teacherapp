@@ -6,6 +6,7 @@ import 'package:teacherapp/utils/custom_colors.dart';
 import '../../controller/user_controller.dart';
 import '../../model/expense_model.dart';
 import '../../utils/my_app_bar.dart';
+import 'expenses_widget_item.dart';
 
 class ExpensesPage extends StatefulWidget {
   const ExpensesPage({super.key});
@@ -15,17 +16,29 @@ class ExpensesPage extends StatefulWidget {
 }
 
 class _ExpensesPageState extends State<ExpensesPage> {
-  final UserController userController = Get.find<UserController>();
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    userController.getExpenses();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(
-          60.0,
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+          ),
         ),
-        child: MyAppBar(_key),
+        title: Text(
+          'Minhas despesas',
+        ),
       ),
       key: _key,
       body: StreamBuilder<List<Expense>>(
@@ -49,20 +62,10 @@ class _ExpensesPageState extends State<ExpensesPage> {
             return ListView.builder(
               itemCount: expenses.length,
               itemBuilder: (context, index) {
-                print(expenses);
                 Expense expense = expenses[index];
 
-                return ListTile(
-                  title: Text(expense.nomeDespesa.toString()),
-                  subtitle: Text('Valor: ${expense.valorDespesa.toString()}'),
-                  trailing: IconButton(
-                    onPressed: () {
-                      userController.deleteExpense(expense.id as String);
-                    },
-                    icon: Icon(
-                      Icons.delete,
-                    ),
-                  ),
+                return ExpensesWidgetItem(
+                  expense: expense,
                 );
               },
             );

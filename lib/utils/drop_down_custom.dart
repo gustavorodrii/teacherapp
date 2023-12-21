@@ -113,8 +113,7 @@ class _DropDownCustomWidgetState extends State<DropDownCustomWidget> {
                                         item,
                                         style: TextStyle(
                                           fontSize: 14,
-                                          fontWeight: FontWeight.w300,
-                                          color: Theme.of(context).primaryColor,
+                                          fontWeight: FontWeight.w400,
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
