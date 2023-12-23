@@ -2,17 +2,20 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:teacherapp/auth/auth_page.dart';
 import 'package:teacherapp/firebase_options.dart';
 import 'package:teacherapp/utils/custom_colors.dart';
-
 import 'controller/user_controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(
-    const MyApp(),
+
+  initializeDateFormatting('pt_BR').then(
+    (value) => runApp(
+      const MyApp(),
+    ),
   );
 }
 
@@ -23,6 +26,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.put(UserController());
     return GetMaterialApp(
+      localizationsDelegates: [
+        DefaultMaterialLocalizations.delegate,
+      ],
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         appBarTheme: const AppBarTheme(

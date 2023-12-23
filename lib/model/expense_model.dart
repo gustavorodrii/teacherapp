@@ -10,6 +10,7 @@ class Expense {
   final String? descriptionAttach;
   final String? kindOfDoc;
   final Timestamp? timestamp;
+  final String? expenseStatus;
 
   Expense({
     this.id,
@@ -21,6 +22,7 @@ class Expense {
     this.descriptionAttach,
     this.kindOfDoc,
     this.timestamp,
+    this.expenseStatus,
   });
 
   factory Expense.fromMap(Map<String, dynamic> map) {
@@ -34,6 +36,7 @@ class Expense {
       descriptionAttach: map['descriptionAttach'],
       kindOfDoc: map['kindOfDoc'],
       timestamp: map['timestamp'],
+      expenseStatus: map['expenseStatus'],
     );
   }
 }

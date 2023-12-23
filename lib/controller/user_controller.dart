@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,6 +22,7 @@ class UserController extends GetxController {
 
   UserModel? userModel;
   String? kindOfDoc = 'Selecione';
+  String? expenseStatusItem = 'Selecione';
 
   final List<String> kindOfDocData = [
     'Selecione',
@@ -28,6 +30,11 @@ class UserController extends GetxController {
     'Nota Fiscal',
     'Boleto',
     'Outros',
+  ];
+  final List<String> expenseStatus = [
+    'Selecione',
+    'Pago',
+    'Em aberto',
   ];
 
   User? firebaseUser;
@@ -75,7 +82,6 @@ class UserController extends GetxController {
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
-  TextEditingController expensesDescriptionAttach = TextEditingController();
 
   void signInFireBase({
     required String email,
@@ -140,6 +146,7 @@ class UserController extends GetxController {
   TextEditingController nomeDespesa = TextEditingController();
   TextEditingController valorDespesa = TextEditingController();
   TextEditingController dataDespesa = TextEditingController();
+  TextEditingController expensesDescriptionAttach = TextEditingController();
 
   void resetControllers() {
     nomeDespesa.clear();
@@ -147,7 +154,7 @@ class UserController extends GetxController {
     dataDespesa.clear();
     expensesDescriptionAttach.clear();
     kindOfDoc = 'Selecione';
-
+    expenseStatusItem = 'Selecione';
     selectedType = 'Selecione';
   }
 
@@ -194,6 +201,7 @@ class UserController extends GetxController {
           kindOfDoc: kindOfDoc,
           descriptionAttach: expensesDescriptionAttach.text,
           timestamp: data,
+          expenseStatus: expenseStatusItem,
         );
 
         await FirebaseFirestore.instance
@@ -209,6 +217,7 @@ class UserController extends GetxController {
           'kindOfDoc': expense.kindOfDoc,
           'descriptionAttach': expense.descriptionAttach,
           'timestamp': expense.timestamp,
+          'expenseStatus': expense.expenseStatus,
         });
         await updateLatestExpenseTimestamp(userId);
 
@@ -288,6 +297,76 @@ class UserController extends GetxController {
     } catch (e) {
       print('Erro ao deletar $e');
     }
+  }
+
+  TextEditingController nomeDespesaEdit = TextEditingController();
+  TextEditingController valorDespesaEdit = TextEditingController();
+  TextEditingController dataDespesaEdit = TextEditingController();
+  TextEditingController expensesDescriptionAttachEdit = TextEditingController();
+  String? kindOfDocEdit = 'Selecione';
+  String? selectedTypeEdit = 'Selecione';
+  String? expenseStatusItemEdit = 'Selecione';
+
+  Future<void> updateExpenses(
+    String expenseId,
+    Expense expense,
+  ) async {
+    // try {
+    User? user = FirebaseAuth.instance.currentUser;
+    String userId = user!.uid;
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(userId)
+        .collection("expenses")
+        .doc(expenseId)
+        .update({
+      'nomeDespesa': expense.nomeDespesa,
+      'dataDespesa': expense.dataDespesa,
+      'tipoDespesa': expense.tipoDespesa,
+      'valorDespesa': expense.valorDespesa,
+      'image': expense.image,
+      'descriptionAttach': expense.descriptionAttach,
+      'kindOfDoc': expense.kindOfDoc,
+      'timestamp': expense.timestamp,
+      'expenseStatus': expense.expenseStatus,
+    });
+    update();
+    getExpenses();
+
+    final index = userController.expensesList
+        .indexWhere((element) => expense.id == expenseId);
+
+    if (index != -1) {
+      userController.expensesList[index] = expense;
+      userController.startExpenseStream();
+    }
+    // } catch (e) {
+    //   print('Erro $e');
+    // }
+  }
+
+  void onClickUpdateExpense(String expenseId) {
+    Expense expense = Expense(
+      nomeDespesa: nomeDespesaEdit.text.trim(),
+      valorDespesa: valorDespesaEdit.text.isEmpty
+          ? null
+          : double.parse(valorDespesaEdit.text),
+      dataDespesa: dataDespesaEdit.text.trim(),
+      tipoDespesa: selectedTypeEdit,
+      image: imageUrl,
+      descriptionAttach: expensesDescriptionAttachEdit.text.trim(),
+      kindOfDoc: kindOfDocEdit,
+      timestamp: Timestamp.now(),
+      expenseStatus: expenseStatusItemEdit,
+    );
+    getExpenses();
+
+    update();
+    Get.back();
+    getExpenses();
+
+    updateExpenses(expenseId, expense);
+    update();
   }
 
   void deleteimage() {

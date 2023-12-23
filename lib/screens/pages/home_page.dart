@@ -204,6 +204,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 TextButton(
                   onPressed: () {
+                    userController.resetControllers();
                     userController.deleteimage();
 
                     Get.dialog(

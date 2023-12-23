@@ -1,6 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:teacherapp/model/expense_model.dart';
 import 'package:teacherapp/screens/dialog/create_expense_dialog.dart';
@@ -8,6 +11,7 @@ import 'package:teacherapp/screens/dialog/create_expense_dialog.dart';
 import '../../utils/custom_colors.dart';
 import '../../utils/dropdown_custon_edit_delete.dart';
 import '../../utils/full_screen_image.dart';
+import '../dialog/edit_expense_dialog.dart';
 
 class ExpensesWidgetItem extends StatefulWidget {
   final Expense expense;
@@ -37,17 +41,23 @@ class _ExpensesWidgetItemState extends State<ExpensesWidgetItem> {
         vertical: 10,
       ),
       child: Container(
+        constraints: BoxConstraints(
+          minHeight: 100,
+        ),
         padding: EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 10,
+          horizontal: 5,
+          vertical: 5,
         ),
         decoration: BoxDecoration(
           color: Color(0xFFFAFAFA),
           boxShadow: [
             BoxShadow(
               color: blue,
-              spreadRadius: 1,
-              offset: Offset.fromDirection(1, 2),
+              spreadRadius: 2,
+              offset: Offset.fromDirection(
+                2,
+                5,
+              ),
             ),
           ],
           borderRadius: BorderRadius.circular(5),
@@ -65,7 +75,7 @@ class _ExpensesWidgetItemState extends State<ExpensesWidgetItem> {
                         widget.expense.nomeDespesa.toString(),
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       Stack(
@@ -73,35 +83,49 @@ class _ExpensesWidgetItemState extends State<ExpensesWidgetItem> {
                           DropDownCustonEditDelete(
                             itens: const ["Editar", "Excluir"],
                             onChanged: (value) async {
-                              Get.dialog(
-                                Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation(
-                                      primaryColor,
+                              if (value == "Excluir") {
+                                Get.dialog(
+                                  Center(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation(
+                                        primaryColor,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
+                                );
 
-                              await Future.delayed(
-                                Duration(
-                                  seconds: 2,
-                                ),
-                              );
-                              Get.back();
-                              if (value == "Excluir") {
+                                await Future.delayed(
+                                  Duration(
+                                    seconds: 2,
+                                  ),
+                                );
+                                Get.back();
                                 userController.deleteExpense(
                                   widget.expense.id as String,
                                 );
+                                FocusScope.of(context).unfocus();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: Colors.red.shade100,
+                                    content: Text(
+                                      'Despesa excluída com sucesso',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                );
                               } else {
                                 userController.resetControllers();
-                                // userController.deleteimage();
+                                userController.deleteimage();
 
-                                // Get.to(
-                                //   () => EditExpensesPage(
-                                //     expense: widget.expense,
-                                //   ),
-                                // );
+                                Get.dialog(
+                                  EditExpenseDialog(
+                                    expense: widget.expense,
+                                  ),
+                                );
                               }
                             },
                           ),
@@ -118,7 +142,7 @@ class _ExpensesWidgetItemState extends State<ExpensesWidgetItem> {
                               text: 'Valor: ',
                               style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                             TextSpan(
@@ -141,10 +165,35 @@ class _ExpensesWidgetItemState extends State<ExpensesWidgetItem> {
                         TextSpan(
                           children: [
                             TextSpan(
+                              text: 'Status da despesa: ',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            TextSpan(
+                              text: widget.expense.expenseStatus,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
                               text: 'Data de pagamento: ',
                               style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                             TextSpan(
@@ -198,7 +247,7 @@ class _ExpensesWidgetItemState extends State<ExpensesWidgetItem> {
                             'Tipo de despesa',
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           Text(
@@ -217,7 +266,7 @@ class _ExpensesWidgetItemState extends State<ExpensesWidgetItem> {
                           height: 200,
                           width: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(5),
                             border: Border.all(
                               color: blue,
                               width: 2,
@@ -230,7 +279,7 @@ class _ExpensesWidgetItemState extends State<ExpensesWidgetItem> {
                                 'Anexo',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                               Container(
