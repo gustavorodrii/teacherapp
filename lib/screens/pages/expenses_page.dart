@@ -18,9 +18,6 @@ class ExpensesPage extends StatefulWidget {
 }
 
 class _ExpensesPageState extends State<ExpensesPage> {
-  String selectedStatus = 'Todas';
-  List<Expense> filteredExpenses = [];
-
   Color todasButtonColor = Color(0xFFDDEAFE);
   Color pagasButtonColor = Color(0xFFDDEAFE);
   Color emAbertoButtonColor = Color(0xFFDDEAFE);
@@ -29,30 +26,9 @@ class _ExpensesPageState extends State<ExpensesPage> {
 
   @override
   void initState() {
+    userController.filterExpenses('Todas');
+    todasButtonColor = Colors.white;
     super.initState();
-    userController.getExpenses();
-    filteredExpenses = userController.expensesList;
-  }
-
-  void filterExpenses(String status) {
-    setState(() {
-      resetButtonColors();
-      if (status == 'Todas') {
-        filteredExpenses = userController.expensesList;
-        todasButtonColor = Colors.white;
-      } else if (status == 'Pago') {
-        filteredExpenses = userController.expensesList
-            .where((expense) => expense.expenseStatus == status)
-            .toList();
-        pagasButtonColor = Colors.white;
-      } else if (status == 'Em aberto') {
-        filteredExpenses = userController.expensesList
-            .where((expense) => expense.expenseStatus == status)
-            .toList();
-        emAbertoButtonColor = Colors.white;
-      }
-      selectedStatus = status;
-    });
   }
 
   void resetButtonColors() {
@@ -98,7 +74,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
                             primary: todasButtonColor,
                           ),
                           onPressed: () {
-                            filterExpenses('Todas');
+                            resetButtonColors();
+                            todasButtonColor = Colors.white;
+
+                            userController.filterExpenses('Todas');
+                            setState(() {});
                           },
                           child: Text(
                             'Todas',
@@ -116,7 +96,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
                             primary: pagasButtonColor,
                           ),
                           onPressed: () {
-                            filterExpenses('Pago');
+                            resetButtonColors();
+                            pagasButtonColor = Colors.white;
+
+                            userController.filterExpenses('Pago');
+                            setState(() {});
                           },
                           child: Text(
                             'Pagas',
@@ -134,7 +118,10 @@ class _ExpensesPageState extends State<ExpensesPage> {
                             primary: emAbertoButtonColor,
                           ),
                           onPressed: () {
-                            filterExpenses('Em aberto');
+                            resetButtonColors();
+                            emAbertoButtonColor = Colors.white;
+                            userController.filterExpenses('Em aberto');
+                            setState(() {});
                           },
                           child: Text(
                             'Em aberto',
@@ -151,7 +138,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                         vertical: 10,
                       ),
                       child: Text(
-                        'Despesas - $selectedStatus',
+                        'Despesas - ${userController.selectedStatus}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -162,7 +149,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                   ],
                 ),
                 Expanded(
-                  child: filteredExpenses.isEmpty
+                  child: userController.filteredExpenses.isEmpty
                       ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -181,39 +168,13 @@ class _ExpensesPageState extends State<ExpensesPage> {
                             ),
                           ],
                         )
-                      : StreamBuilder<List<Expense>>(
-                          stream: userController.expensesStream,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation(
-                                    primaryColor,
-                                  ),
-                                ),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                  child: Text('Erro: ${snapshot.error}'));
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return Center(
-                                  child: Text('Nenhuma despesa encontrada.'));
-                            } else {
-                              List<Expense> expenses = snapshot.data!;
-
-                              return ListView.builder(
-                                itemCount: filteredExpenses.length,
-                                itemBuilder: (context, index) {
-                                  Expense expense = filteredExpenses[index];
-
-                                  return ExpensesWidgetItem(
-                                    expense: expense,
-                                  );
-                                },
-                              );
-                            }
+                      : ListView.builder(
+                          itemCount: userController.filteredExpenses.length,
+                          itemBuilder: (context, index) {
+                            Expense expense = userController.filteredExpenses[index];
+                            return ExpensesWidgetItem(
+                              expense: expense,
+                            );
                           },
                         ),
                 ),

@@ -84,26 +84,10 @@ class _ExpensesWidgetItemState extends State<ExpensesWidgetItem> {
                             itens: const ["Editar", "Excluir"],
                             onChanged: (value) async {
                               if (value == "Excluir") {
-                                Get.dialog(
-                                  Center(
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation(
-                                        primaryColor,
-                                      ),
-                                    ),
-                                  ),
-                                );
-
-                                await Future.delayed(
-                                  Duration(
-                                    seconds: 2,
-                                  ),
-                                );
-                                Get.back();
-                                userController.deleteExpense(
+                                await userController.deleteExpense(
                                   widget.expense.id as String,
                                 );
-                                FocusScope.of(context).unfocus();
+
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     backgroundColor: Colors.red.shade100,
@@ -146,8 +130,7 @@ class _ExpensesWidgetItemState extends State<ExpensesWidgetItem> {
                               ),
                             ),
                             TextSpan(
-                              text:
-                                  'R\$ ${widget.expense.valorDespesa?.toStringAsFixed(2)}',
+                              text: 'R\$ ${widget.expense.valorDespesa?.toStringAsFixed(2)}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,

@@ -11,13 +11,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:teacherapp/model/user_model.dart';
 import 'package:teacherapp/screens/login/login_page.dart';
+import 'package:teacherapp/screens/pages/expenses_page.dart';
 
 import '../model/expense_model.dart';
 
 class UserController extends GetxController {
   RxBool isLoading = false.obs;
-  Rx<Map<String, dynamic>> userData =
-      Rx<Map<String, dynamic>>(<String, dynamic>{});
+  Rx<Map<String, dynamic>> userData = Rx<Map<String, dynamic>>(<String, dynamic>{});
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   UserModel? userModel;
@@ -42,10 +42,7 @@ class UserController extends GetxController {
   Future<void> _saveUserData(UserModel userData) async {
     userModel = userData;
 
-    await firestore
-        .collection("users")
-        .doc(firebaseUser!.uid)
-        .set(userModel!.toMap());
+    await firestore.collection("users").doc(firebaseUser!.uid).set(userModel!.toMap());
   }
 
   void signUpFireBase({
@@ -96,11 +93,7 @@ class UserController extends GetxController {
     )
         .then((value) async {
       firebaseUser = value.user;
-      await firestore
-          .collection("users")
-          .doc(firebaseUser!.uid)
-          .get()
-          .then((userSnapshot) {
+      await firestore.collection("users").doc(firebaseUser!.uid).get().then((userSnapshot) {
         if (userSnapshot.exists) {
           userController.userData.value = userSnapshot.data()!;
         }
@@ -169,8 +162,7 @@ class UserController extends GetxController {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        Timestamp latestTimestamp =
-            querySnapshot.docs.first['timestamp'] as Timestamp;
+        Timestamp latestTimestamp = querySnapshot.docs.first['timestamp'] as Timestamp;
 
         await FirebaseFirestore.instance
             .collection('users')
@@ -220,14 +212,15 @@ class UserController extends GetxController {
           'expenseStatus': expense.expenseStatus,
         });
         await updateLatestExpenseTimestamp(userId);
-
-        update();
-
         resetControllers();
+        expensesList.add(expense);
         update();
         getExpenses();
-
+        update();
         Get.back();
+        Get.to(
+          () => ExpensesPage(),
+        );
         update();
       } else {
         print('Usuário não autenticado.');
@@ -237,13 +230,22 @@ class UserController extends GetxController {
     }
   }
 
-  RxList<Expense> expensesList = <Expense>[].obs;
-  final _expensesController = StreamController<List<Expense>>.broadcast();
-  Stream<List<Expense>> get expensesStream => _expensesController.stream;
+  String selectedStatus = 'Todas';
+  List<Expense> filteredExpenses = [];
 
-  void startExpenseStream() {
-    _expensesController.add(expensesList);
+  void filterExpenses(String status) {
+    if (status == 'Todas') {
+      filteredExpenses = expensesList;
+    } else if (status == 'Pago') {
+      filteredExpenses = expensesList.where((expense) => expense.expenseStatus == status).toList();
+    } else if (status == 'Em aberto') {
+      filteredExpenses = expensesList.where((expense) => expense.expenseStatus == status).toList();
+    }
+    selectedStatus = status;
+    getExpenses();
   }
+
+  RxList<Expense> expensesList = <Expense>[].obs;
 
   Future<void> getExpenses() async {
     try {
@@ -252,10 +254,8 @@ class UserController extends GetxController {
       if (user != null) {
         String userId = user.uid;
 
-        CollectionReference expensesCollection = FirebaseFirestore.instance
-            .collection('users')
-            .doc(userId)
-            .collection('expenses');
+        CollectionReference expensesCollection =
+            FirebaseFirestore.instance.collection('users').doc(userId).collection('expenses');
         update();
 
         QuerySnapshot querySnapshot = await expensesCollection.get();
@@ -267,9 +267,10 @@ class UserController extends GetxController {
           return Expense.fromMap(data);
         }).toList();
         update();
-
-        expensesList.assignAll(expenses);
-        startExpenseStream();
+        expensesList.clear();
+        expensesList.addAll(expenses);
+        filteredExpenses.clear();
+        filteredExpenses.addAll(expenses);
         update();
       }
     } catch (e) {
@@ -292,8 +293,10 @@ class UserController extends GetxController {
       expensesList.removeWhere(
         (element) => element.id == id,
       );
+
       update();
       getExpenses();
+      update();
     } catch (e) {
       print('Erro ao deletar $e');
     }
@@ -333,12 +336,10 @@ class UserController extends GetxController {
     update();
     getExpenses();
 
-    final index = userController.expensesList
-        .indexWhere((element) => expense.id == expenseId);
+    final index = userController.expensesList.indexWhere((element) => expense.id == expenseId);
 
     if (index != -1) {
       userController.expensesList[index] = expense;
-      userController.startExpenseStream();
     }
     // } catch (e) {
     //   print('Erro $e');
@@ -348,9 +349,7 @@ class UserController extends GetxController {
   void onClickUpdateExpense(String expenseId) {
     Expense expense = Expense(
       nomeDespesa: nomeDespesaEdit.text.trim(),
-      valorDespesa: valorDespesaEdit.text.isEmpty
-          ? null
-          : double.parse(valorDespesaEdit.text),
+      valorDespesa: valorDespesaEdit.text.isEmpty ? null : double.parse(valorDespesaEdit.text),
       dataDespesa: dataDespesaEdit.text.trim(),
       tipoDespesa: selectedTypeEdit,
       image: imageUrl,
@@ -359,7 +358,6 @@ class UserController extends GetxController {
       timestamp: Timestamp.now(),
       expenseStatus: expenseStatusItemEdit,
     );
-    getExpenses();
 
     update();
     Get.back();
